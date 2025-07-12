@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { api } from '../services/api';
+import { useUserStore } from './userStore';
+
 export type User = {
   id: string;
   name: string;
@@ -10,6 +11,7 @@ export type User = {
   reputation: number;
   role: 'user' | 'admin';
 };
+
 type AuthState = {
   user: User | null;
   token: string | null;
@@ -19,49 +21,69 @@ type AuthState = {
   logout: () => void;
   updateUser: (user: Partial<User>) => void;
 };
-export const useAuthStore = create<AuthState>()(persist(set => ({
-  user: null,
-  token: null,
-  isAuthenticated: false,
-  login: async (email, password) => {
-    try {
-      const response = await api.auth.login(email, password);
-      set({
-        user: response.user,
-        token: response.token,
-        isAuthenticated: true
-      });
-    } catch (error) {
-      throw error;
-    }
-  },
-  register: async (name, email, password) => {
-    try {
-      const response = await api.auth.register(name, email, password);
-      set({
-        user: response.user,
-        token: response.token,
-        isAuthenticated: true
-      });
-    } catch (error) {
-      throw error;
-    }
-  },
-  logout: () => {
-    set({
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
       user: null,
       token: null,
-      isAuthenticated: false
-    });
-  },
-  updateUser: userData => {
-    set(state => ({
-      user: state.user ? {
-        ...state.user,
-        ...userData
-      } : null
-    }));
-  }
-}), {
-  name: 'auth-storage'
-}));
+      isAuthenticated: false,
+
+      // Login using userStore
+      login: async (email, password) => {
+        const user = useUserStore.getState().findUserByEmail(email);
+        if (!user) throw new Error('User not found');
+
+        set({
+          user,
+          token: 'mock-token',
+          isAuthenticated: true,
+        });
+      },
+
+      // Register + store in userStore + login
+      register: async (name, email, password) => {
+        const id = Date.now().toString();
+        const newUser: User = {
+          id,
+          name,
+          username: email.split('@')[0],
+          email,
+          avatar: '',
+          reputation: 0,
+          role: 'user',
+        };
+
+        useUserStore.getState().addUser(newUser);
+
+        set({
+          user: newUser,
+          token: 'mock-token',
+          isAuthenticated: true,
+        });
+      },
+
+      logout: () => {
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+        });
+      },
+
+      updateUser: (userData) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...userData } : null,
+        }));
+      },
+    }),
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    }
+  )
+);
