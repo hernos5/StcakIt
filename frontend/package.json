@@ -16,12 +16,11 @@
     "sonner": "^2.0.1",
     "lucide-react": "^0.441.0",
     "framer-motion": "^11.5.4",
-    "zustand": "latest",
-    "zustand/middleware": "latest",
+    "zustand": "^4.5.2",
     "axios": "^1.7.7",
     "react-hook-form": "^7.53.0",
     "zod": "^3.23.8",
-    "@hookform/resolvers/zod": "latest",
+    "@hookform/resolvers": "^3.3.4",
     "react-quill": "^2.0.0"
   },
   "devDependencies": {
