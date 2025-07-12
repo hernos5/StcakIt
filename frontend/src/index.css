@@ -1,0 +1,25 @@
+/* PLEASE NOTE: THESE TAILWIND IMPORTS SHOULD NEVER BE DELETED */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+/* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+@layer base {
+  body {
+    @apply bg-background-dark text-text-light font-sora;
+  }
+}
+@layer components {
+  .glass-card {
+    @apply bg-background-medium bg-opacity-70 backdrop-blur-md border border-white/10 rounded-xl shadow-lg;
+  }
+  .glass-nav {
+    @apply bg-background-dark bg-opacity-80 backdrop-blur-md border-b border-white/10;
+  }
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-glow;
+  }
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+}
